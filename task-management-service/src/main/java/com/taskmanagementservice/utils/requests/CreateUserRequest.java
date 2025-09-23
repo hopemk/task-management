@@ -6,6 +6,7 @@ public class CreateUserRequest {
     private String lastName;
     private String username;
     private String phoneNumber;
+    private String password;
 
     public String getFirstName() {
         return firstName;
@@ -30,6 +31,13 @@ public class CreateUserRequest {
     }
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
     }
     @Override
     public String toString() {

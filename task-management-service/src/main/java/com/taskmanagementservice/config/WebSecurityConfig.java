@@ -1,8 +1,8 @@
 package com.taskmanagementservice.config;
 
-import com.microfinance.security.jwt.AuthEntryPointJwt;
-import com.microfinance.security.jwt.AuthTokenFilter;
-import com.microfinance.security.service.UserDetailsServiceImpl;
+import com.taskmanagementservice.jwt.AuthEntryPointJwt;
+import com.taskmanagementservice.jwt.AuthTokenFilter;
+import com.taskmanagementservice.business.logic.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -89,9 +89,10 @@ public class WebSecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("/api/auth/**").permitAll()
+                auth.requestMatchers("/api/auth/**", "/auth/**").permitAll()
                     .requestMatchers("/api/test/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/webjars/**", "/swagger-resources/**").permitAll()
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/webjars/**", "/swagger-resources/**").permitAll()
+                        .requestMatchers("/api/task").hasAnyRole("USER", "ADMIN")
                     .anyRequest().authenticated()
             );
         

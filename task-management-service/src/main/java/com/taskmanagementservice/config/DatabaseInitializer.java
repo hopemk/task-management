@@ -5,36 +5,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
+import java.util.List;
 
-/**
- * Component to initialize the database with required data on application startup.
- */
 @Component
 public class DatabaseInitializer implements CommandLineRunner {
 
     @Autowired
     private RoleRepository roleRepository;
 
-    /**
-     * Initializes the database with required roles.
-     *
-     * @param args Command line arguments
-     */
     @Override
     public void run(String... args) {
 
-        //initRoles();
+        initRoles();
     }
 
-    /**
-     * Initializes the roles in the database if they don't exist.
-     */
-//    private void initRoles() {
-//        Arrays.stream(ERole.values()).forEach(role -> {
-//            if (!roleRepository.findByName(role).isPresent()) {
-//                Role newRole = new Role(role, "Role for " + role.name());
-//                roleRepository.save(newRole);
-//            }
-//        });
-//    }
+    private void initRoles() {
+
+        List<String> roles = Arrays.asList("ROLE_USER", "ROLE_ADMIN");
+
+        for (String roleName : roles) {
+            if (!roleRepository.existsByName(roleName)) {
+                roleRepository.save(new com.taskmanagementservice.model.Role(roleName, ""));
+            }
+        }
+    }
 }

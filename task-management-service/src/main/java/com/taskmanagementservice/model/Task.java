@@ -9,12 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import org.springframework.security.core.parameters.P;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "tasks")
 public class Task {
 
     @Id
@@ -24,7 +22,9 @@ public class Task {
     private String title;
     private String description;
     @Enumerated(EnumType.STRING)
-    private EntityStatus status;
+    private EntityStatus entityStatus;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus taskStatus;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -55,12 +55,12 @@ public class Task {
         this.description = description;
     }
 
-    public EntityStatus getStatus() {
-        return status;
+    public EntityStatus getEntityStatus() {
+        return entityStatus;
     }
 
-    public void setStatus(EntityStatus status) {
-        this.status = status;
+    public void setEntityStatus(EntityStatus status) {
+        this.entityStatus = status;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -95,9 +95,17 @@ public class Task {
         this.updatedBy = updatedBy;
     }
 
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
     @PrePersist
     public void prePersist() {
-        this.status = EntityStatus.ACTIVE;
+        this.entityStatus = EntityStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -112,7 +120,7 @@ public class Task {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", status=" + status +
+                ", status=" + entityStatus +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", createdBy='" + createdBy + '\'' +

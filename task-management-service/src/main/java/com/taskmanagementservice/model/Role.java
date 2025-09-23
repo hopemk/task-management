@@ -31,6 +31,14 @@ public class Role {
     private String createdBy;
     private String updatedBy;
 
+    public Role(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Role() {
+
+    }
 
     public String getDescription() {
         return description;
