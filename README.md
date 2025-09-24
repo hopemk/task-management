@@ -22,8 +22,6 @@ A simple Spring Boot REST API for managing tasks with JWT-based authentication.
    - Or with Maven installed: `mvn -f task-management-service spring-boot:run`
 3) The app runs on http://localhost:9003
 
-Swagger UI: http://localhost:9003/swagger-ui.html
-
 ## Configuration
 Default config is in `task-management-service/src/main/resources/application.properties`:
 - Port: `server.port=9003`
@@ -89,5 +87,4 @@ curl -X DELETE http://localhost:9003/api/tasks/1 \
   -H "Authorization: Bearer $TOKEN" 
 
 ## Notes
-- Use Swagger UI to try endpoints interactively (set the Bearer token via the Authorize button).
 - Logs are verbose for Spring Security by default; adjust in `application.properties` if needed.
