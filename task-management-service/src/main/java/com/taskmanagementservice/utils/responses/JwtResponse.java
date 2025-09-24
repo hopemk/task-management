@@ -1,7 +1,9 @@
 package com.taskmanagementservice.utils.responses;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.taskmanagementservice.utils.dto.JwtDto;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class JwtResponse extends CommonResponse{
 
     private JwtDto jwtDto;

@@ -1,9 +1,11 @@
 package com.taskmanagementservice.utils.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.taskmanagementservice.model.EntityStatus;
 import com.taskmanagementservice.model.TaskStatus;
 import java.time.LocalDateTime;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskDto {
 
     private Long id;

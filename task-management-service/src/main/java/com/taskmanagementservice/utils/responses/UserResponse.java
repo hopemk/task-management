@@ -1,9 +1,11 @@
 package com.taskmanagementservice.utils.responses;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.taskmanagementservice.utils.dto.UserDto;
 import org.springframework.data.domain.Page;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse extends CommonResponse{
 
     private UserDto userDto;

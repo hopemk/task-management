@@ -4,18 +4,24 @@ import com.taskmanagementservice.business.logic.service.MessageService;
 import com.taskmanagementservice.business.logic.service.TaskService;
 import com.taskmanagementservice.business.validator.service.TaskServiceValidator;
 import com.taskmanagementservice.model.EntityStatus;
+import com.taskmanagementservice.model.Task;
+import com.taskmanagementservice.model.TaskStatus;
+import com.taskmanagementservice.utils.auth.AuthDetailsUtil;
 import com.taskmanagementservice.utils.dto.TaskDto;
 import com.taskmanagementservice.utils.dto.ValidatorDto;
 import com.taskmanagementservice.utils.enums.I18Code;
 import com.taskmanagementservice.utils.requests.CreateTaskRequest;
 import com.taskmanagementservice.utils.requests.EditTaskRequest;
 import com.taskmanagementservice.utils.responses.TaskResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+@Slf4j
 public class TaskServiceImpl implements TaskService {
 
     private final MessageService messageService;
@@ -42,18 +48,18 @@ public class TaskServiceImpl implements TaskService {
         if (!validatorDto.isValid()) {
             message = messageService.getMessage(I18Code.MESSAGE_CREATE_TASK_INVALID_REQUEST.getCode(), new String[]{},
                     locale);
-            return buildTaskResponse(message, 400, false, null, null, null, validatorDto.getErrorMessages());
+            return buildTaskResponse(message, 400, false, null, null,
+                    null, validatorDto.getErrorMessages());
         }
         
-        com.taskmanagementservice.model.Task task = modelMapper.map(createTaskRequest, com.taskmanagementservice.model.Task.class);
-        String username = org.springframework.security.core.context.SecurityContextHolder.getContext() != null &&
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() != null ?
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName() :
-                "system";
-        task.setCreatedBy(username);
-        com.taskmanagementservice.model.Task saved = taskRepository.save(task);
+        Task taskToBeSaved = modelMapper.map(createTaskRequest, Task.class);
 
-        TaskDto taskDto = modelMapper.map(saved, TaskDto.class);
+        taskToBeSaved.setCreatedBy(AuthDetailsUtil.getLoggedInUsername());
+
+        Task taskSaved = taskRepository.save(taskToBeSaved);
+        log.info("Task created successfully with title: {}", taskSaved.getTitle());
+
+        TaskDto taskDto = modelMapper.map(taskSaved, TaskDto.class);
 
         message = messageService.getMessage(I18Code.MESSAGE_CREATE_TASK_SUCCESSFUL.getCode(), new String[]{},
                 locale);
@@ -70,56 +76,53 @@ public class TaskServiceImpl implements TaskService {
             return buildTaskResponse(message, 400, false, null, null, null, validatorDto.getErrorMessages());
         }
 
-        Optional<com.taskmanagementservice.model.Task> optionalTask = taskRepository.findById(taskId);
-        if (optionalTask.isEmpty() || optionalTask.get().getEntityStatus() == EntityStatus.DELETED) {
+        Optional<Task> taskRetrieved = taskRepository.
+                findByIdAndCreatedByAndEntityStatusNot(taskId, AuthDetailsUtil.getLoggedInUsername(), EntityStatus.DELETED);
+        if (taskRetrieved.isEmpty() || taskRetrieved.get().getEntityStatus() == EntityStatus.DELETED) {
             message = messageService.getMessage(I18Code.MESSAGE_TASK_NOT_FOUND.getCode(), new String[]{String.valueOf(taskId)}, locale);
-            return buildTaskResponse(message, 404, false, null, null, null, null);
+            return buildTaskResponse(message, 400, false, null,
+                    null, null, null);
         }
 
-        com.taskmanagementservice.model.Task task = optionalTask.get();
-        task.setTitle(editTaskRequest.getTitle());
-        task.setDescription(editTaskRequest.getDescription());
-        String username = org.springframework.security.core.context.SecurityContextHolder.getContext() != null &&
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() != null ?
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName() :
-                "system";
-        task.setUpdatedBy(username);
+        Task taskEdited = taskRepository.save(buildTaskForUpdate(taskRetrieved.get(), editTaskRequest));
 
-        com.taskmanagementservice.model.Task saved = taskRepository.save(task);
-        TaskDto taskDto = modelMapper.map(saved, TaskDto.class);
+        log.info("Task edited successfully with title: {}", taskEdited.getTitle());
+
+        TaskDto taskDto = modelMapper.map(taskEdited, TaskDto.class);
 
         message = messageService.getMessage(I18Code.MESSAGE_EDIT_TASK_SUCCESSFUL.getCode(), new String[]{}, locale);
-        return buildTaskResponse(message, 200, true, taskDto, null, null, null);
+        return buildTaskResponse(message, 200, true, taskDto, null,
+                null, null);
     }
 
     @Override
     public TaskResponse deleteTask(Long taskId, Locale locale) {
+
         String message;
-        Optional<com.taskmanagementservice.model.Task> optionalTask = taskRepository.findById(taskId);
-        if (optionalTask.isEmpty() || optionalTask.get().getEntityStatus() == EntityStatus.DELETED) {
+
+        Optional<Task> taskRetrieved = taskRepository.findByIdAndCreatedByAndEntityStatusNot(taskId, AuthDetailsUtil.getLoggedInUsername(), EntityStatus.DELETED);
+
+        if (taskRetrieved.isEmpty()) {
             message = messageService.getMessage(I18Code.MESSAGE_TASK_NOT_FOUND.getCode(), new String[]{String.valueOf(taskId)}, locale);
-            return buildTaskResponse(message, 404, false, null, null, null, null);
+            return buildTaskResponse(message, 400, false, null, null, null, null);
         }
 
-        com.taskmanagementservice.model.Task task = optionalTask.get();
-        task.setEntityStatus(EntityStatus.DELETED);
-        String username = org.springframework.security.core.context.SecurityContextHolder.getContext() != null &&
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() != null ?
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName() :
-                "system";
-        task.setUpdatedBy(username);
-        com.taskmanagementservice.model.Task saved = taskRepository.save(task);
+        Task taskDeleted = taskRepository.save(buildTaskToDelete(taskRetrieved.get()));
 
-        TaskDto taskDto = modelMapper.map(saved, TaskDto.class);
+        TaskDto taskDeletedDto = modelMapper.map(taskDeleted, TaskDto.class);
         message = messageService.getMessage(I18Code.MESSAGE_DELETE_TASK_SUCCESSFUL.getCode(), new String[]{}, locale);
-        return buildTaskResponse(message, 200, true, taskDto, null, null, null);
+        return buildTaskResponse(message, 200, true, taskDeletedDto, null, null, null);
     }
 
     @Override
     public TaskResponse getTaskById(Long taskId, Locale locale) {
+
         String message;
-        Optional<com.taskmanagementservice.model.Task> optionalTask = taskRepository.findById(taskId);
-        if (optionalTask.isEmpty() || optionalTask.get().getEntityStatus() == EntityStatus.DELETED) {
+
+        Optional<Task> optionalTask = taskRepository
+                .findByIdAndCreatedByAndEntityStatusNot(taskId, AuthDetailsUtil.getLoggedInUsername(), EntityStatus.DELETED);
+
+        if (optionalTask.isEmpty()) {
             message = messageService.getMessage(I18Code.MESSAGE_TASK_NOT_FOUND.getCode(), new String[]{String.valueOf(taskId)}, locale);
             return buildTaskResponse(message, 404, false, null, null, null, null);
         }
@@ -131,7 +134,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponse getAllTasks(Locale locale) {
-        List<com.taskmanagementservice.model.Task> tasks = taskRepository.findByEntityStatusNot(EntityStatus.DELETED);
+        List<Task> tasks = taskRepository.findByCreatedByAndEntityStatusNot(AuthDetailsUtil.getLoggedInUsername(), EntityStatus.DELETED);
 
         if (tasks.isEmpty()) {
             String message = messageService.getMessage(I18Code.MESSAGE_TASK_NOT_FOUND.getCode(), new String[]{}, locale);
@@ -142,6 +145,26 @@ public class TaskServiceImpl implements TaskService {
 
         String message = messageService.getMessage(I18Code.MESSAGE_GET_TASK_SUCCESSFUL.getCode(), new String[]{}, locale);
         return buildTaskResponse(message, 200, true, null, taskDtoListReturned, null, null);
+    }
+
+    private Task buildTaskForUpdate(Task task, EditTaskRequest editTaskRequest) {
+
+        task.setTitle(editTaskRequest.getTitle());
+        task.setDescription(editTaskRequest.getDescription());
+        task.setTaskStatus(TaskStatus.valueOf(editTaskRequest.getTaskStatus()));
+        task.setUpdatedBy(AuthDetailsUtil.getLoggedInUsername());
+
+        return task;
+    }
+
+    private Task buildTaskToDelete(Task task) {
+
+        task.setEntityStatus(EntityStatus.DELETED);
+        String username = AuthDetailsUtil.getLoggedInUsername();
+        task.setTitle(task.getTitle() + " " + LocalDateTime.now().toString());
+        task.setUpdatedBy(username);
+
+        return task;
     }
 
     private TaskResponse buildTaskResponse(String message, int statusCode, boolean success,

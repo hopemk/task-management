@@ -29,7 +29,9 @@ public enum I18Code {
     MESSAGE_DELETE_TASK_SUCCESSFUL("messages.delete.task.successful"),
     MESSAGE_GET_TASK_SUCCESSFUL("messages.get.task.successful"),
     MESSAGE_TASK_NOT_FOUND("messages.task.not.found"),
-    MESSAGE_TASK_OPERATION_NOT_IMPLEMENTED("messages.task.operation.not.implemented");
+    MESSAGE_TASK_OPERATION_NOT_IMPLEMENTED("messages.task.operation.not.implemented"),
+    MESSAGE_EDIT_TASK_NULL_OR_EMPTY_TASK_STATUS("messages.edit.task.null.or.empty.task.status"),
+    MESSAGE_EDIT_TASK_INVALID_TASK_STATUS("messages.edit.task.invalid.task.status"),;
     private String code;
 
     I18Code(String code) {

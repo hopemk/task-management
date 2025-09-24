@@ -9,6 +9,7 @@ import com.taskmanagementservice.model.Role;
 import com.taskmanagementservice.model.User;
 import com.taskmanagementservice.repository.RoleRepository;
 import com.taskmanagementservice.repository.UserRepository;
+import com.taskmanagementservice.utils.auth.AuthDetailsUtil;
 import com.taskmanagementservice.utils.dto.JwtDto;
 import com.taskmanagementservice.utils.dto.UserDto;
 import com.taskmanagementservice.utils.dto.ValidatorDto;
@@ -17,12 +18,13 @@ import com.taskmanagementservice.utils.requests.CreateUserRequest;
 import com.taskmanagementservice.utils.requests.LoginRequest;
 import com.taskmanagementservice.utils.responses.JwtResponse;
 import com.taskmanagementservice.utils.responses.UserResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final MessageService messageService;
@@ -70,9 +73,10 @@ public class UserServiceImpl implements UserService {
             return buildUserResponse(message, 400, false,null, null, null, null);
         }
 
-
         User userSaved = userRepository.save(buildUser(createUserRequest));
 
+        log.info("User created successfully with username: {}", userSaved.getUsername());
+        
         UserDto userDto = modelMapper.map(userSaved, UserDto.class);
 
         message = messageService.getMessage(I18Code.MESSAGE_CREATE_USER_SUCCESSFUL.getCode(), new String[]{createUserRequest.getUsername()},
@@ -93,26 +97,37 @@ public class UserServiceImpl implements UserService {
             return buildJwtResponse(message, 400, false, null, validatorDto.getErrorMessages());
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+            log.info("User logged in successfully with username: {}", authentication.getName());
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        JwtDto jwtDto = buildJwtDto(userDetails, jwt);
-        message = messageService.getMessage(I18Code.MESSAGE_LOGIN_INVALID_REQUEST.getCode(), new String[]{},
-                locale);
-        return buildJwtResponse(message, 200, true, jwtDto, null);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+            JwtDto jwtDto = buildJwtDto(userDetails, jwt);
+            message = messageService.getMessage(I18Code.MESSAGE_LOGIN_INVALID_REQUEST.getCode(), new String[]{},
+                    locale);
+            return buildJwtResponse(message, 200, true, jwtDto, null);
+        } catch (AuthenticationException ex) {
+            log.warn("Authentication failed for username={}: {}", loginRequest.getUsername(), ex.getClass().getSimpleName());
+            message = messageService.getMessage(I18Code.MESSAGE_LOGIN_INVALID_REQUEST.getCode(), new String[]{},
+                    locale);
+            return buildJwtResponse(message, 401, false, null, null);
+        } catch (Exception ex) {
+            log.error("Unexpected error during login for username={}", loginRequest.getUsername(), ex);
+            message = messageService.getMessage(I18Code.MESSAGE_LOGIN_INVALID_REQUEST.getCode(), new String[]{},
+                    locale);
+            return buildJwtResponse(message, 500, false, null, null);
+        }
     }
 
     private User buildUser(CreateUserRequest createUserRequest){
 
         User user = modelMapper.map(createUserRequest, User.class);
-
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        user.setCreatedBy(username);
+        user.setCreatedBy(AuthDetailsUtil.getLoggedInUsername());
         user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
 
         Optional<Role> role = roleRepository.findByName("ROLE_USER");
