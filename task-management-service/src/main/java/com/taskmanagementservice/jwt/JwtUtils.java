@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${microfinance.app.jwtSecret}")
+    @Value("${taskmanagement.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${microfinance.app.jwtExpirationMs}")
+    @Value("${taskmanagement.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
     public String generateJwtToken(Authentication authentication) {
