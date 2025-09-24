@@ -15,9 +15,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Utility class for JWT token operations.
- */
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
@@ -28,12 +25,6 @@ public class JwtUtils {
     @Value("${microfinance.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    /**
-     * Generates a JWT token for the authenticated user.
-     *
-     * @param authentication The authentication object containing user details
-     * @return The generated JWT token
-     */
     public String generateJwtToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -50,32 +41,15 @@ public class JwtUtils {
                 .compact();
     }
 
-    /**
-     * Gets the signing key for JWT token.
-     *
-     * @return The signing key
-     */
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    /**
-     * Extracts the username (email) from the JWT token.
-     *
-     * @param token The JWT token
-     * @return The username (email) extracted from the token
-     */
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key()).build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
 
-    /**
-     * Validates the JWT token.
-     *
-     * @param authToken The JWT token to validate
-     * @return True if the token is valid, false otherwise
-     */
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);

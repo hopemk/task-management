@@ -5,15 +5,11 @@ import com.taskmanagementservice.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of UserDetails interface for Spring Security.
- */
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
@@ -28,17 +24,6 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    /**
-     * Constructor for UserDetailsImpl.
-     *
-     * @param id The user ID
-     * @param firstName The user's first name
-     * @param lastName The user's last name
-     * @param email The user's email
-     * @param password The user's password
-     * @param phoneNumber The user's phone number
-     * @param authorities The user's authorities
-     */
     public UserDetailsImpl(String id, String firstName, String lastName, String email, String password,
                           String phoneNumber, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
@@ -50,12 +35,6 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
-    /**
-     * Builds a UserDetailsImpl from a User entity.
-     *
-     * @param user The User entity
-     * @return A UserDetailsImpl instance
-     */
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))

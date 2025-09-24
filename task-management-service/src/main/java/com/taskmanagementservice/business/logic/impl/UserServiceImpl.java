@@ -18,8 +18,9 @@ import com.taskmanagementservice.utils.requests.CreateUserRequest;
 import com.taskmanagementservice.utils.requests.LoginRequest;
 import com.taskmanagementservice.utils.responses.JwtResponse;
 import com.taskmanagementservice.utils.responses.UserResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final MessageService messageService;
@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     public UserServiceImpl(MessageService messageService, UserRepository userRepository, UserValidatorService userValidatorService, PasswordEncoder encoder, RoleRepository roleRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
         this.messageService = messageService;

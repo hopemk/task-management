@@ -14,23 +14,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * JWT Authentication Entry Point to handle unauthorized requests.
- */
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
-    /**
-     * This method is called when a user tries to access a secured REST resource without providing any credentials.
-     *
-     * @param request The HTTP request
-     * @param response The HTTP response
-     * @param authException The authentication exception
-     * @throws IOException If an I/O exception occurs
-     * @throws ServletException If a servlet exception occurs
-     */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {

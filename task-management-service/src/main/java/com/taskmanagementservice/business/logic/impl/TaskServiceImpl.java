@@ -6,6 +6,7 @@ import com.taskmanagementservice.business.validator.service.TaskServiceValidator
 import com.taskmanagementservice.model.EntityStatus;
 import com.taskmanagementservice.model.Task;
 import com.taskmanagementservice.model.TaskStatus;
+import com.taskmanagementservice.repository.TaskRepository;
 import com.taskmanagementservice.utils.auth.AuthDetailsUtil;
 import com.taskmanagementservice.utils.dto.TaskDto;
 import com.taskmanagementservice.utils.dto.ValidatorDto;
@@ -13,7 +14,8 @@ import com.taskmanagementservice.utils.enums.I18Code;
 import com.taskmanagementservice.utils.requests.CreateTaskRequest;
 import com.taskmanagementservice.utils.requests.EditTaskRequest;
 import com.taskmanagementservice.utils.responses.TaskResponse;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import java.time.LocalDateTime;
@@ -21,18 +23,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-@Slf4j
 public class TaskServiceImpl implements TaskService {
 
     private final MessageService messageService;
     private final TaskServiceValidator taskServiceValidator;
     private final ModelMapper modelMapper;
-    private final com.taskmanagementservice.repository.TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
+    private static final Logger log = LoggerFactory.getLogger(TaskServiceImpl.class);
 
     public TaskServiceImpl(MessageService messageService,
                            TaskServiceValidator taskServiceValidator,
                            ModelMapper modelMapper,
-                           com.taskmanagementservice.repository.TaskRepository taskRepository) {
+                           TaskRepository taskRepository) {
         this.messageService = messageService;
         this.taskServiceValidator = taskServiceValidator;
         this.modelMapper = modelMapper;
