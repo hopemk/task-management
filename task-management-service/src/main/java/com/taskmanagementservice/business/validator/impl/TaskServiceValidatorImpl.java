@@ -7,16 +7,17 @@ import com.taskmanagementservice.utils.dto.ValidatorDto;
 import com.taskmanagementservice.utils.enums.I18Code;
 import com.taskmanagementservice.utils.requests.CreateTaskRequest;
 import com.taskmanagementservice.utils.requests.EditTaskRequest;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-@Slf4j
 public class TaskServiceValidatorImpl implements TaskServiceValidator {
 
     private final MessageServiceImpl messageService;
+    private static final Logger log = LoggerFactory.getLogger(TaskServiceValidatorImpl.class);
 
     public TaskServiceValidatorImpl(MessageServiceImpl messageService) {
         this.messageService = messageService;
