@@ -38,6 +38,15 @@ public class TaskServiceValidatorImpl implements TaskServiceValidator {
                     locale));
         }
 
+        if (createTaskRequest.getTitle() != null && createTaskRequest.getTitle().trim().length() > 100) {
+            errors.add(messageService.getMessage(I18Code.MESSAGE_CREATE_TASK_INVALID_TITLE_SIZE.getCode(), new String[]{},
+                    locale));
+        }
+
+        if (createTaskRequest.getDescription() != null && createTaskRequest.getDescription().trim().length() > 500) {
+            errors.add(messageService.getMessage(I18Code.MESSAGE_CREATE_TASK_INVALID_DESCRIPTION_SIZE.getCode(), new String[]{},
+                    locale));
+        }
 
         if (!errors.isEmpty()) {
             return new ValidatorDto(false, errors);
@@ -75,6 +84,17 @@ public class TaskServiceValidatorImpl implements TaskServiceValidator {
                         locale));
             }
         }
+
+        if (editTaskRequest.getTitle() != null && editTaskRequest.getTitle().trim().length() > 100) {
+            errors.add(messageService.getMessage(I18Code.MESSAGE_CREATE_TASK_INVALID_TITLE_SIZE.getCode(), new String[]{},
+                    locale));
+        }
+
+        if (editTaskRequest.getDescription() != null && editTaskRequest.getDescription().trim().length() > 500) {
+            errors.add(messageService.getMessage(I18Code.MESSAGE_CREATE_TASK_INVALID_DESCRIPTION_SIZE.getCode(), new String[]{},
+                    locale));
+        }
+
         return new ValidatorDto(true, Collections.emptyList());
     }
 }

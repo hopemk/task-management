@@ -31,7 +31,9 @@ public enum I18Code {
     MESSAGE_TASK_NOT_FOUND("messages.task.not.found"),
     MESSAGE_TASK_OPERATION_NOT_IMPLEMENTED("messages.task.operation.not.implemented"),
     MESSAGE_EDIT_TASK_NULL_OR_EMPTY_TASK_STATUS("messages.edit.task.null.or.empty.task.status"),
-    MESSAGE_EDIT_TASK_INVALID_TASK_STATUS("messages.edit.task.invalid.task.status"),;
+    MESSAGE_EDIT_TASK_INVALID_TASK_STATUS("messages.edit.task.invalid.task.status"),
+    MESSAGE_CREATE_TASK_INVALID_TITLE_SIZE("messages.create.task.invalid.title.size"),
+    MESSAGE_CREATE_TASK_INVALID_DESCRIPTION_SIZE("messages.create.task.invalid.description.size"),;
     private String code;
 
     I18Code(String code) {
