@@ -26,14 +26,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        JwtResponse jwtResponse = userService.login(loginRequest, Locale.ENGLISH);
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, Locale locale) {
+        JwtResponse jwtResponse = userService.login(loginRequest, locale);
         return ResponseEntity.status(jwtResponse.getStatusCode()).body(jwtResponse);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
-        UserResponse response = userService.create(createUserRequest, Locale.ENGLISH);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody CreateUserRequest createUserRequest, Locale locale) {
+        UserResponse response = userService.create(createUserRequest, locale);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 }

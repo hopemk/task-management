@@ -1,5 +1,6 @@
 package com.taskmanagementservice.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,6 +15,8 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,14 +32,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "first_name", length = 25, nullable = false)
     private String firstName;
 
+    @Column(name = "last_name", length = 25, nullable = false)
     private String lastName;
 
+    @Column(name = "username", length = 25, nullable = false)
     private String username;
 
+    @Column(name = "password", length = 250, nullable = false)
     private String password;
 
+    @Column(name = "phoneNumber", length = 13, nullable = true)
     private String phoneNumber;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -56,7 +64,9 @@ public class User {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    @Column(name = "created_by", length = 25, nullable = false)
     private String createdBy;
+    @Column(name = "updated_by", length = 25, nullable = true)
     private String updatedBy;
 
     public Long getId() {

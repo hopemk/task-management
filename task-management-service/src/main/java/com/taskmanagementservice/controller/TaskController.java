@@ -23,37 +23,37 @@ public class TaskController {
 
     @PreAuthorize("hasRole(T(com.taskmanagementservice.utils.enums.TaskManagementServiceRoles).USER.toString())")
     @PostMapping
-    public ResponseEntity<?> createTask(@Valid @RequestBody CreateTaskRequest request) {
-        TaskResponse response = taskService.createTask(request, Locale.ENGLISH);
+    public ResponseEntity<?> createTask(@Valid @RequestBody CreateTaskRequest request, Locale locale) {
+        TaskResponse response = taskService.createTask(request,locale);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @PreAuthorize("hasRole(T(com.taskmanagementservice.utils.enums.TaskManagementServiceRoles).USER.toString())")
     @PutMapping("/{taskId}")
     public ResponseEntity<?> editTask(@PathVariable("taskId") Long taskId,
-                                      @Valid @RequestBody EditTaskRequest request) {
-        TaskResponse response = taskService.editTask(taskId, request, Locale.ENGLISH);
+                                      @Valid @RequestBody EditTaskRequest request, Locale locale) {
+        TaskResponse response = taskService.editTask(taskId, request, locale);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @PreAuthorize("hasRole(T(com.taskmanagementservice.utils.enums.TaskManagementServiceRoles).USER.toString())")
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<?> deleteTask(@PathVariable("taskId") Long taskId) {
-        TaskResponse response = taskService.deleteTask(taskId, Locale.ENGLISH);
+    public ResponseEntity<?> deleteTask(@PathVariable("taskId") Long taskId, Locale locale) {
+        TaskResponse response = taskService.deleteTask(taskId, locale);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @PreAuthorize("hasRole(T(com.taskmanagementservice.utils.enums.TaskManagementServiceRoles).USER.toString())")
     @GetMapping("/{taskId}")
-    public ResponseEntity<?> getTaskById(@PathVariable("taskId") Long taskId) {
-        TaskResponse response = taskService.getTaskById(taskId, Locale.ENGLISH);
+    public ResponseEntity<?> getTaskById(@PathVariable("taskId") Long taskId, Locale locale) {
+        TaskResponse response = taskService.getTaskById(taskId, locale);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @PreAuthorize("hasRole(T(com.taskmanagementservice.utils.enums.TaskManagementServiceRoles).USER.toString())")
     @GetMapping
-    public ResponseEntity<?> getAllTasks() {
-        TaskResponse response = taskService.getAllTasks(Locale.ENGLISH);
+    public ResponseEntity<?> getAllTasks( Locale locale) {
+        TaskResponse response = taskService.getAllTasks(locale);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 }

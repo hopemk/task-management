@@ -1,5 +1,6 @@
 package com.taskmanagementservice.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,7 +20,9 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "title", length = 50, nullable = false)
     private String title;
+    @Column(name = "description", length = 500, nullable = false)
     private String description;
     @Enumerated(EnumType.STRING)
     private EntityStatus entityStatus;
@@ -28,7 +31,9 @@ public class Task {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    @Column(name = "created_by", length = 25, nullable = false)
     private String createdBy;
+    @Column(name = "updated_by", length = 100, nullable = true)
     private String updatedBy;
 
     public Long getId() {
@@ -107,6 +112,7 @@ public class Task {
     public void prePersist() {
         this.entityStatus = EntityStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
+        this.taskStatus = TaskStatus.PENDING;
     }
 
     @PreUpdate
